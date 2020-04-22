@@ -3,7 +3,6 @@ dependencies:
 - pip:
   - azureml-sdk
   - azureml-train-automl
-  - azureml-pipeline
   - azureml-widgets
   - matplotlib
-  - pandas_ml
+  - azureml-pipeline

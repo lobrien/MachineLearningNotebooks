@@ -117,7 +117,7 @@ jupyter notebook
     - Simple example of using automated ML for regression
     - Uses azure compute for training
 
-- [auto-ml-regression-hardware-performance-explanation-and-featurization.ipynb](regression-hardware-performance-explanation-and-featurization/auto-ml-regression-hardware-performance-explanation-and-featurization.ipynb)
+- [auto-ml-regression-explanation-featurization.ipynb](regression-explanation-featurization/auto-ml-regression-explanation-featurization.ipynb)
     - Dataset: Hardware Performance Dataset
     - Shows featurization and excplanation
     - Uses azure compute for training
@@ -144,7 +144,7 @@ jupyter notebook
     - Dataset: forecasting for a bike-sharing
     - Example of training an automated ML forecasting model on multiple time-series
 
-- [automl-forecasting-function.ipynb](forecasting-high-frequency/automl-forecasting-function.ipynb)
+- [auto-ml-forecasting-function.ipynb](forecasting-high-frequency/auto-ml-forecasting-function.ipynb)
     - Example of training an automated ML forecasting model on multiple time-series
 
 - [auto-ml-forecasting-beer-remote.ipynb](forecasting-beer-remote/auto-ml-forecasting-beer-remote.ipynb)
@@ -152,7 +152,7 @@ jupyter notebook
     - Beer Production Forecasting
 
 - [auto-ml-continuous-retraining.ipynb](continuous-retraining/auto-ml-continuous-retraining.ipynb)
-    - Continous retraining using Pipelines and Time-Series TabularDataset
+    - Continuous retraining using Pipelines and Time-Series TabularDataset
 
 - [auto-ml-classification-text-dnn.ipynb](classification-text-dnn/auto-ml-classification-text-dnn.ipynb)
     - Classification with text data using deep learning in AutoML
@@ -196,6 +196,17 @@ If automl_setup_linux.sh fails on Ubuntu Linux with the error: `unable to execut
 3) Check that you have Contributor or Owner access to the Subscription.
 4) Check that the region is one of the supported regions: `eastus2`, `eastus`, `westcentralus`, `southeastasia`, `westeurope`, `australiaeast`, `westus2`, `southcentralus`
 5) Check that you have access to the region using the Azure Portal.
+
+## import AutoMLConfig fails after upgrade from before 1.0.76 to 1.0.76 or later
+There were package changes in automated machine learning version 1.0.76, which require the previous version to be uninstalled before upgrading to the new version.
+If you have manually upgraded from a version of automated machine learning before 1.0.76 to 1.0.76 or later, you may get the error:
+`ImportError: cannot import name 'AutoMLConfig'`
+
+This can be resolved by running:
+`pip uninstall azureml-train-automl` and then 
+`pip install azureml-train-automl`
+
+The automl_setup.cmd script does this automatically.
 
 ## workspace.from_config fails
 If the call `ws = Workspace.from_config()` fails:

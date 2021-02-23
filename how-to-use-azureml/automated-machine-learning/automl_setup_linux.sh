@@ -4,6 +4,7 @@ CONDA_ENV_NAME=$1
 AUTOML_ENV_FILE=$2
 OPTIONS=$3
 PIP_NO_WARN_SCRIPT_LOCATION=0
+CHECK_CONDA_VERSION_SCRIPT="check_conda_version.py"
 
 if [ "$CONDA_ENV_NAME" == "" ]
 then
@@ -12,7 +13,7 @@ fi
 
 if [ "$AUTOML_ENV_FILE" == "" ]
 then
-  AUTOML_ENV_FILE="automl_env.yml"
+  AUTOML_ENV_FILE="automl_env_linux.yml"
 fi
 
 if [ ! -f $AUTOML_ENV_FILE ]; then
@@ -20,10 +21,23 @@ if [ ! -f $AUTOML_ENV_FILE ]; then
     exit 1
 fi
 
+if [ ! -f $CHECK_CONDA_VERSION_SCRIPT ]; then
+    echo "File $CHECK_CONDA_VERSION_SCRIPT not found"
+    exit 1
+fi
+
+python "$CHECK_CONDA_VERSION_SCRIPT"
+if [ $? -ne 0 ]; then
+    exit 1
+fi
+
+sed -i 's/AZUREML-SDK-VERSION/latest/' $AUTOML_ENV_FILE
+
 if source activate $CONDA_ENV_NAME 2> /dev/null
 then
-   echo "Upgrading azureml-sdk[automl,notebooks,explain] in existing conda environment" $CONDA_ENV_NAME
-   pip install --upgrade azureml-sdk[automl,notebooks,explain] &&
+   echo "Upgrading existing conda environment" $CONDA_ENV_NAME
+   pip uninstall azureml-train-automl -y -q
+   conda env update --name $CONDA_ENV_NAME --file $AUTOML_ENV_FILE &&
    jupyter nbextension uninstall --user --py azureml.widgets
 else
    conda env create -f $AUTOML_ENV_FILE -n $CONDA_ENV_NAME &&

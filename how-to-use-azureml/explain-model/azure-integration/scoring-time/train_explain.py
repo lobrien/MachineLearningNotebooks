@@ -6,7 +6,7 @@ import os
 import pandas as pd
 import zipfile
 from sklearn.model_selection import train_test_split
-from sklearn.externals import joblib
+import joblib
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
@@ -14,9 +14,9 @@ from sklearn.linear_model import LogisticRegression
 from sklearn_pandas import DataFrameMapper
 
 from azureml.core.run import Run
-from azureml.explain.model.tabular_explainer import TabularExplainer
-from azureml.contrib.explain.model.explanation.explanation_client import ExplanationClient
-from azureml.explain.model.scoring.scoring_explainer import LinearScoringExplainer, save
+from interpret.ext.blackbox import TabularExplainer
+from azureml.interpret import ExplanationClient
+from azureml.interpret.scoring.scoring_explainer import LinearScoringExplainer, save
 
 OUTPUT_DIR = './outputs/'
 os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -116,7 +116,7 @@ global_explanation = tabular_explainer.explain_global(x_test)
 
 # uploading model explanation data for storage or visualization
 comment = 'Global explanation on classification model trained on IBM employee attrition dataset'
-client.upload_model_explanation(global_explanation, comment=comment)
+client.upload_model_explanation(global_explanation, comment=comment, model_id=original_model.id)
 
 # also create a lightweight explainer for scoring time
 scoring_explainer = LinearScoringExplainer(tabular_explainer)

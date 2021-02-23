@@ -6,16 +6,28 @@ set PIP_NO_WARN_SCRIPT_LOCATION=0
 
 IF "%conda_env_name%"=="" SET conda_env_name="azure_automl"
 IF "%automl_env_file%"=="" SET automl_env_file="automl_env.yml"
+SET check_conda_version_script="check_conda_version.py"
 
 IF NOT EXIST %automl_env_file% GOTO YmlMissing
 
 IF "%CONDA_EXE%"=="" GOTO CondaMissing
 
+IF NOT EXIST %check_conda_version_script% GOTO VersionCheckMissing
+
+python "%check_conda_version_script%"
+IF errorlevel 1 GOTO ErrorExit:
+
+SET replace_version_script="replace_latest_version.ps1"
+IF EXIST %replace_version_script% (
+  powershell -file %replace_version_script% %automl_env_file%
+)
+
 call conda activate %conda_env_name% 2>nul:
 
 if not errorlevel 1 (
-  echo Upgrading azureml-sdk[automl,notebooks,explain] in existing conda environment %conda_env_name%
-  call pip install --upgrade azureml-sdk[automl,notebooks,explain]
+  echo Upgrading existing conda environment %conda_env_name%
+  call pip uninstall azureml-train-automl -y -q
+  call conda env update --name %conda_env_name% --file %automl_env_file%
   if errorlevel 1 goto ErrorExit
 ) else (
   call conda env create -f %automl_env_file% -n %conda_env_name%
@@ -51,6 +63,10 @@ echo typing Anaconda Prompt on the Start menu.
 echo If you don't see the Anaconda Prompt app, install Miniconda.
 echo If you are running an older version of Miniconda or Anaconda,
 echo you can upgrade using the command: conda update conda
+goto End
+
+:VersionCheckMissing
+echo File %check_conda_version_script% not found.
 goto End
 
 :YmlMissing
